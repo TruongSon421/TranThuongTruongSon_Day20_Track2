@@ -87,6 +87,8 @@ speedup: ~3.6× decode rate, ~5.2× E2E latency improvement
 
 Điều thú vị là Q2_K (nhỏ hơn, nên băng thông cần ít hơn) lại *chậm hơn* Q4 trên GPU: 56.6 vs 64.5 tok/s. Lý do là Q2 dequantization overhead trên GPU cao hơn lợi ích từ file nhỏ hơn — GPU đủ VRAM để fit Q4 nên không có pressure, trong khi Q2 thêm compute để unpack 2-bit weights. Đây là bằng chứng rằng "quant nhỏ hơn = nhanh hơn" chỉ đúng khi bị memory-constrained, không phải khi VRAM dư.
 
+**Bonus deep-dive (C6: Vulkan vs CUDA trên cùng máy):** Với cùng model `gemma-4-E2B-it-UD-Q4_K_XL.gguf`, benchmark `llama-bench -p 512 -n 128 -r 3 -ngl 99` cho thấy Vulkan thắng mạnh ở prefill (`pp512`: 621.19 tok/s vs CUDA 273.45 tok/s, ~2.27x), nhưng CUDA vẫn nhỉnh hơn ở decode (`tg128`: 67.23 tok/s vs Vulkan 59.17 tok/s, ~1.14x). Kết quả này cho thấy backend tối ưu phụ thuộc workload phase (prefill vs decode), không có "one backend wins all". Chi tiết tại `benchmarks/bonus-c6-vulkan-vs-cuda.md`.
+
 ---
 
 ## 6. (Optional) Điều ngạc nhiên nhất
@@ -101,11 +103,11 @@ Gemma-4 với ISWA (Interleaved Sliding Window Attention) không expose `kv_cach
 - [x] `models/active.json` đã commit (hoặc paste path snapshot vào section 1)
 - [x] `benchmarks/01-quickstart-results.md` đã commit
 - [x] `benchmarks/02-server-metrics-u10.csv` và `benchmarks/02-server-metrics-u50.csv` đã commit
-- [ ] `benchmarks/bonus-*.md` đã commit (ít nhất 1 sweep)
-- [ ] Ít nhất 6 screenshots trong `submission/screenshots/` (xem `submission/screenshots/README.md`)
-- [ ] `make verify` exit 0 (chạy ngay trước khi push)
-- [ ] Repo trên GitHub ở chế độ **public**
-- [ ] Đã paste public repo URL vào VinUni LMS
+- [x] `benchmarks/bonus-*.md` đã commit (ít nhất 1 sweep)
+- [x] Ít nhất 6 screenshots trong `submission/screenshots/` (xem `submission/screenshots/README.md`)
+- [x] `make verify` exit 0 (chạy ngay trước khi push)
+- [x] Repo trên GitHub ở chế độ **public**
+- [x] Đã paste public repo URL vào VinUni LMS
 
 ---
 
