@@ -31,6 +31,35 @@ INTERESTING = {
 LINE = re.compile(r"^([a-z_:]+)(?:\{[^}]*\})?\s+([0-9eE.+-]+)$")
 
 
+def scrape_kv_ratio_from_slots(base_url: str) -> float:
+    """Compute kv_cache_usage_ratio from /slots when /metrics doesn't expose it.
+
+    llama.cpp >=b9000 removed kv_cache_usage_ratio from /metrics for ISWA models.
+    We derive it: for each active slot, tokens in KV = n_decoded (generated so far).
+    Ratio = sum(n_decoded across processing slots) / sum(n_ctx across all slots).
+    """
+    import json as _json
+    import re as _re
+    try:
+        resp = httpx.get(base_url.replace("/metrics", "/slots"), timeout=3.0)
+        raw = _re.sub(r'[\x00-\x1f\x7f]', ' ', resp.text)
+        slots = _json.loads(raw)
+        total_ctx = sum(s.get("n_ctx", 0) for s in slots)
+        if total_ctx == 0:
+            return 0.0
+        used = 0
+        for s in slots:
+            if s.get("is_processing"):
+                nt = s.get("next_token")
+                if isinstance(nt, list) and nt:
+                    used += nt[0].get("n_decoded", 0)
+                elif isinstance(nt, dict):
+                    used += nt.get("n_decoded", 0)
+        return used / total_ctx
+    except Exception:
+        return 0.0
+
+
 def scrape(url: str) -> dict[str, float]:
     out: dict[str, float] = {}
     try:
@@ -49,6 +78,9 @@ def scrape(url: str) -> dict[str, float]:
                 out[name] = float(val)
             except ValueError:
                 pass
+    # Backfill kv_cache_usage_ratio from /slots if not in /metrics (llama.cpp >=b9000)
+    if "llamacpp:kv_cache_usage_ratio" not in out:
+        out["llamacpp:kv_cache_usage_ratio"] = scrape_kv_ratio_from_slots(url)
     return out
 
 

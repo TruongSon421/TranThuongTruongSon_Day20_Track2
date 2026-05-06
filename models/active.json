@@ -1,0 +1,6 @@
+{
+  "tier": "Llama-3.2-3B-Instruct",
+  "repo_id": "unsloth/gemma-4-E2B-it-GGUF",
+  "primary_model": "models/gemma-4-E2B-it-UD-Q4_K_XL.gguf",
+  "compare_model": "models/gemma-4-E2B-it-UD-Q2_K_XL.gguf"
+}

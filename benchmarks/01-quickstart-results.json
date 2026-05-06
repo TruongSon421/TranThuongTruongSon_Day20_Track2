@@ -1,0 +1,36 @@
+{
+  "primary": {
+    "label": "primary (Q4_K_M)",
+    "model_path": "models/gemma-4-E2B-it-UD-Q4_K_XL.gguf",
+    "n_threads": 12,
+    "n_ctx": 2048,
+    "n_batch": 512,
+    "n_gpu_layers": 99,
+    "load_ms": 2717.0,
+    "ttft_ms_p50": 74.5,
+    "ttft_ms_p95": 138.1,
+    "tpot_ms_p50": 15.51,
+    "tpot_ms_p95": 16.21,
+    "e2e_ms_p50": 1045.5,
+    "e2e_ms_p95": 1106.4,
+    "e2e_ms_p99": 1130.7,
+    "decode_rate_tok_s": 64.5
+  },
+  "compare": {
+    "label": "compare (Q2_K)",
+    "model_path": "models/gemma-4-E2B-it-UD-Q2_K_XL.gguf",
+    "n_threads": 12,
+    "n_ctx": 2048,
+    "n_batch": 512,
+    "n_gpu_layers": 99,
+    "load_ms": 2400.7,
+    "ttft_ms_p50": 75.6,
+    "ttft_ms_p95": 119.7,
+    "tpot_ms_p50": 17.65,
+    "tpot_ms_p95": 18.36,
+    "e2e_ms_p50": 1187.3,
+    "e2e_ms_p95": 1234.2,
+    "e2e_ms_p99": 1235.0,
+    "decode_rate_tok_s": 56.6
+  }
+}

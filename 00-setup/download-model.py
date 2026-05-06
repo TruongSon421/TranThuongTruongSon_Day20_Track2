@@ -65,6 +65,21 @@ def main() -> int:
         action="store_true",
         help="Don't fetch — only locate already-downloaded files and write models/active.json",
     )
+    parser.add_argument(
+        "--repo-id",
+        default=None,
+        help="Override Hugging Face repo id (e.g. user/repo).",
+    )
+    parser.add_argument(
+        "--primary-file",
+        default=None,
+        help="Override primary GGUF filename (Q4-ish).",
+    )
+    parser.add_argument(
+        "--compare-file",
+        default=None,
+        help="Override comparison GGUF filename (Q2-ish).",
+    )
     args = parser.parse_args()
 
     hw_path = Path("hardware.json")
@@ -74,7 +89,10 @@ def main() -> int:
 
     hw = json.loads(hw_path.read_text())
     tier_key = pick_tier(hw["recommendation"]["recommended_model"])
-    repo_id, q4_file, q2_file = TIERS[tier_key]
+    tier_repo_id, tier_q4_file, tier_q2_file = TIERS[tier_key]
+    repo_id = args.repo_id or tier_repo_id
+    q4_file = args.primary_file or tier_q4_file
+    q2_file = args.compare_file or tier_q2_file
 
     out_dir = Path("models")
     out_dir.mkdir(exist_ok=True)
